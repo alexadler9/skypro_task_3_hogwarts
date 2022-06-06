@@ -9,9 +9,9 @@ public interface FacultyService {
 
     Faculty get(Long facultyId);
 
-    Faculty update(Faculty faculty);
+    Faculty update(Long facultyId, Faculty faculty);
 
-    Faculty remove(Long facultyId);
+    void remove(Long facultyId);
 
     Collection<Faculty> filterByColor(String color);
 }
