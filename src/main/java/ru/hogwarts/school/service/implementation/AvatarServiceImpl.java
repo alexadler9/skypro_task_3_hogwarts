@@ -21,7 +21,6 @@ import java.util.Objects;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
-@Transactional
 public class AvatarServiceImpl implements AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentService studentService;
@@ -39,10 +38,14 @@ public class AvatarServiceImpl implements AvatarService {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
+    private Avatar getOrCreate(Long studentId) {
+        return avatarRepository.findAvatarByStudentId(studentId).orElse(new Avatar());
+    }
+
     private byte[] generateAvatarThumbnailImage(Path avatarImagePath) throws IOException {
         try (InputStream is = Files.newInputStream(avatarImagePath);
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             BufferedInputStream bis = new BufferedInputStream(is)) {
+             BufferedInputStream bis = new BufferedInputStream(is, 1024)) {
             BufferedImage avatarImage = ImageIO.read(bis);
 
             int newWidth = 100;
@@ -60,10 +63,26 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public Avatar get(Long studentId) {
-        return avatarRepository.findAvatarByStudentId(studentId).orElse(new Avatar());
+        return avatarRepository.findAvatarByStudentId(studentId).orElse(null);
     }
 
     @Override
+    public byte[] getFileData(Long studentId) throws IOException {
+        Avatar avatar = get(studentId);
+        if (avatar == null) {
+            return null;
+        }
+
+        try (InputStream is = Files.newInputStream(Path.of(avatar.getFilePath()));
+             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             BufferedInputStream bis = new BufferedInputStream(is, 1024)) {
+            bis.transferTo(baos);
+            return baos.toByteArray();
+        }
+    }
+
+    @Override
+    @Transactional
     public void upload(Long studentId, MultipartFile avatarFile) throws IOException {
         Student student = studentService.get(studentId);
         Path filePath = Path.of(avatarsDir, student.getId() + "." + getExtensions(Objects.requireNonNull(avatarFile.getOriginalFilename())));
@@ -72,12 +91,12 @@ public class AvatarServiceImpl implements AvatarService {
 
         try (InputStream is = avatarFile.getInputStream();
              OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is);
-             BufferedOutputStream bos = new BufferedOutputStream(os)) {
+             BufferedInputStream bis = new BufferedInputStream(is, 1024);
+             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)) {
             bis.transferTo(bos);
         }
 
-        Avatar avatar = get(studentId);
+        Avatar avatar = getOrCreate(studentId);
         avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
         avatar.setFileSize(avatarFile.getSize());

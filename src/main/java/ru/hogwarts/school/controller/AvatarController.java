@@ -10,11 +10,9 @@ import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.service.AvatarService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/avatar")
@@ -28,6 +26,9 @@ public class AvatarController {
     @GetMapping("/{studentId}/db")
     public ResponseEntity<byte[]> getAvatar(@PathVariable Long studentId) {
         Avatar avatar = avatarService.get(studentId);
+        if (avatar == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
@@ -39,14 +40,17 @@ public class AvatarController {
     @GetMapping("/{studentId}/file")
     public void getAvatar(@PathVariable Long studentId, HttpServletResponse response) throws IOException {
         Avatar avatar = avatarService.get(studentId);
-        Path filePath = Path.of(avatar.getFilePath());
-
-        try (InputStream is = Files.newInputStream(filePath);
-             OutputStream os = response.getOutputStream()) {
-            response.setStatus(HttpStatus.OK.value());
-            response.setContentType(avatar.getMediaType());
-            response.setContentLength((int)avatar.getFileSize());
-            is.transferTo(os);
+        byte[] avatarData = avatarService.getFileData(studentId);
+        if (avatar == null || avatarData == null) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+        } else {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(avatarData);
+                 OutputStream os = response.getOutputStream()) {
+                response.setStatus(HttpStatus.OK.value());
+                response.setContentType(avatar.getMediaType());
+                response.setContentLength((int)avatar.getFileSize());
+                bais.transferTo(os);
+            }
         }
     }
 
