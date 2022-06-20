@@ -14,8 +14,6 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.implementation.FacultyServiceImpl;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,16 +23,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.hogwarts.school.SchoolApplicationConstants.*;
 
-@WebMvcTest
+@WebMvcTest(FacultyController.class)
 public class FacultyControllerTests {
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private AvatarController avatarController;
-
-    @MockBean
-    private StudentController studentController;
 
     @MockBean
     private FacultyRepository facultyRepository;
