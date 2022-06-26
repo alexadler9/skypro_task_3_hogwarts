@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/avatar")
@@ -52,6 +53,12 @@ public class AvatarController {
                 bais.transferTo(os);
             }
         }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Collection<Avatar>> getAllAvatars(@RequestParam int page, @RequestParam int size) {
+        Collection<Avatar> avatars = avatarService.getAll(page, size);
+        return ResponseEntity.ok(avatars);
     }
 
     @PostMapping(value = "/{studentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

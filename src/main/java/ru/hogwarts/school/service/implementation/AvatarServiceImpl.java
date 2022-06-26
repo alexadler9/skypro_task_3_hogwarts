@@ -1,8 +1,10 @@
 package ru.hogwarts.school.service.implementation;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.hogwarts.school.exception.InvalidRequestParameterException;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
@@ -16,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Objects;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -64,6 +67,15 @@ public class AvatarServiceImpl implements AvatarService {
     @Override
     public Avatar get(Long studentId) {
         return avatarRepository.findAvatarByStudentId(studentId).orElse(null);
+    }
+
+    @Override
+    public Collection<Avatar> getAll(int page, int size) {
+        if (page < 1) {
+            throw new InvalidRequestParameterException("Invalid page number");
+        }
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return avatarRepository.findAll(pageRequest).getContent();
     }
 
     @Override
