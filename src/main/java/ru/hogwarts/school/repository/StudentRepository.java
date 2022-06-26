@@ -9,9 +9,9 @@ import java.util.Collection;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
-    Collection<Student> findAllByAge(int age);
+    Collection<Student> findAllByAge(Integer age);
 
-    Collection<Student> findAllByAgeBetween(int minAge, int maxAge);
+    Collection<Student> findAllByAgeBetween(Integer minAge, Integer maxAge);
 
     @Query(value = "SELECT * FROM student ORDER BY id DESC LIMIT :number", nativeQuery = true)
     Collection<Student> getRecent(int number);
