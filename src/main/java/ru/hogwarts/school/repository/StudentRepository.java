@@ -13,7 +13,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Collection<Student> findAllByAgeBetween(int minAge, int maxAge);
 
-    @Query(value = "SELECT * FROM student ORDER BY id DESC LIMIT (:number)", nativeQuery = true)
+    @Query(value = "SELECT * FROM student ORDER BY id DESC LIMIT :number", nativeQuery = true)
     Collection<Student> getRecent(int number);
 
     @Query(value = "SELECT COUNT(*) FROM student", nativeQuery = true)
