@@ -1,6 +1,6 @@
 SELECT student.name, student.age, faculty.name as faculty_name
 FROM student
-LEFT JOIN faculty ON student.faculty_id = faculty.id;
+INNER JOIN faculty ON student.faculty_id = faculty.id;
 
 SELECT student.name, student.age
 FROM student
