@@ -33,7 +33,7 @@ public class AvatarServiceImpl implements AvatarService {
     @Value("${path.to.students.avatars.folder}")
     private String avatarsDir;
 
-    Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
 
     public AvatarServiceImpl(AvatarRepository avatarRepository,
                              StudentService studentService) {

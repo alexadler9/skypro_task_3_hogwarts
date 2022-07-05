@@ -14,7 +14,7 @@ import java.util.Collection;
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
 
-    Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
 
     public StudentServiceImpl(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
