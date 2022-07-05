@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service.implementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ public class AvatarServiceImpl implements AvatarService {
     @Value("${path.to.students.avatars.folder}")
     private String avatarsDir;
 
+    Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
+
     public AvatarServiceImpl(AvatarRepository avatarRepository,
                              StudentService studentService) {
         this.avatarRepository = avatarRepository;
@@ -46,6 +50,7 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     private byte[] generateAvatarThumbnailImage(Path avatarImagePath) throws IOException {
+        logger.debug("Was invoked method for generate avatar thumbnail");
         try (InputStream is = Files.newInputStream(avatarImagePath);
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
              BufferedInputStream bis = new BufferedInputStream(is, 1024)) {
@@ -66,12 +71,15 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public Avatar get(Long studentId) {
+        logger.info("Was invoked method for get avatar for student {}", studentId);
         return avatarRepository.findAvatarByStudentId(studentId).orElse(null);
     }
 
     @Override
     public Collection<Avatar> getAll(int page, int size) {
+        logger.info("Was invoked method for get all avatars; page: {}, size: {}", page, size);
         if (page < 1) {
+            logger.error("Invalid page number");
             throw new InvalidRequestParameterException("Invalid page number");
         }
         PageRequest pageRequest = PageRequest.of(page - 1, size);
@@ -80,8 +88,10 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public byte[] getFileData(Long studentId) throws IOException {
+        logger.info("Was invoked method for get avatar file data for student {}", studentId);
         Avatar avatar = get(studentId);
         if (avatar == null) {
+            logger.warn("Avatar is missing");
             return null;
         }
 
@@ -96,6 +106,7 @@ public class AvatarServiceImpl implements AvatarService {
     @Override
     @Transactional
     public void upload(Long studentId, MultipartFile avatarFile) throws IOException {
+        logger.info("Was invoked method for update avatar for student {}", studentId);
         Student student = studentService.get(studentId);
         Path filePath = Path.of(avatarsDir, student.getId() + "." + getExtensions(Objects.requireNonNull(avatarFile.getOriginalFilename())));
         Files.createDirectories(filePath.getParent());
