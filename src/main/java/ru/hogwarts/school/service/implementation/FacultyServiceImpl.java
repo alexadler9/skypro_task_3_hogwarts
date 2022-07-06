@@ -15,7 +15,7 @@ import java.util.Set;
 public class FacultyServiceImpl implements FacultyService {
     private final FacultyRepository facultyRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(FacultyServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FacultyServiceImpl.class);
 
     public FacultyServiceImpl(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
@@ -23,43 +23,43 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty add(Faculty faculty) {
-        logger.info("Was invoked method for create faculty");
+        LOG.info("Was invoked method for create faculty");
         faculty.setId(null);
         Faculty newFaculty = facultyRepository.save(faculty);
-        logger.debug("New faculty has been created: {}", newFaculty);
+        LOG.debug("New faculty has been created: {}", newFaculty);
         return newFaculty;
     }
 
     @Override
     public Faculty get(Long facultyId) {
-        logger.info("Was invoked method for get faculty {}", facultyId);
+        LOG.info("Was invoked method for get faculty {}", facultyId);
         return facultyRepository.findById(facultyId).orElse(null);
     }
 
     @Override
     public Faculty update(Long facultyId, Faculty faculty) {
-        logger.info("Was invoked method for update faculty {}", facultyId);
+        LOG.info("Was invoked method for update faculty {}", facultyId);
         faculty.setId(facultyId);
         Faculty updatedFaculty = facultyRepository.save(faculty);
-        logger.debug("Faculty has been updated: {}", updatedFaculty);
+        LOG.debug("Faculty has been updated: {}", updatedFaculty);
         return updatedFaculty;
     }
 
     @Override
     public void remove(Long facultyId) {
-        logger.info("Was invoked method for delete faculty {}", facultyId);
+        LOG.info("Was invoked method for delete faculty {}", facultyId);
         facultyRepository.deleteById(facultyId);
     }
 
     @Override
     public Collection<Faculty> filterByColorOrName(String param) {
-        logger.info("Was invoked method for filter faculties by param {}", param);
+        LOG.info("Was invoked method for filter faculties by param {}", param);
         return facultyRepository.findAllByColorOrNameIgnoreCase(param);
     }
 
     @Override
     public Set<Student> getStudents(Long facultyId) {
-        logger.info("Was invoked method for get students for faculty {}", facultyId);
+        LOG.info("Was invoked method for get students for faculty {}", facultyId);
         return facultyRepository.findById(facultyId).map(Faculty::getStudents).orElse(null);
     }
 }
