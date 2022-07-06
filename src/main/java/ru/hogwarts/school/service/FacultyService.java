@@ -18,4 +18,8 @@ public interface FacultyService {
     Collection<Faculty> filterByColorOrName(String param);
 
     Set<Student> getStudents(Long facultyId);
+
+    String getLongestName();
+
+    Long getTestValue();
 }

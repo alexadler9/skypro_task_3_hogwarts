@@ -22,6 +22,8 @@ public interface StudentService {
 
     Collection<Student> getRecentList(int number);
 
+    Collection<String> getNamesList(Character startLetter);
+
     Integer getCount();
 
     Double getAverageAge();

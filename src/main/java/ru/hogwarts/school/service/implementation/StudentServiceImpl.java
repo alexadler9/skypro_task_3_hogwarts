@@ -3,6 +3,7 @@ package ru.hogwarts.school.service.implementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.InvalidRequestParameterException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
@@ -75,6 +76,20 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public Collection<String> getNamesList(Character startLetter) {
+        LOG.info("Was invoked method for get list of student names starting with letter {}", startLetter);
+        if (!Character.isLetter(startLetter)) {
+            LOG.error("Invalid letter");
+            throw new InvalidRequestParameterException("Invalid letter");
+        }
+        return studentRepository.findAll().stream()
+                .map(s -> s.getName().toUpperCase())
+                .filter(n -> n.startsWith(startLetter.toString().toUpperCase()))
+                .sorted()
+                .toList();
+    }
+
+    @Override
     public Integer getCount() {
         LOG.info("Was invoked method for get count of students");
         Integer count = studentRepository.getCount();
@@ -85,7 +100,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Double getAverageAge() {
         LOG.info("Was invoked method for get average age of students");
-        Double averageAge = studentRepository.getAverageAge();
+        //Double averageAge = studentRepository.getAverageAge();
+        Double averageAge = studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .summaryStatistics()
+                .getAverage();
         LOG.debug("Average age of students: {}", averageAge);
         return averageAge;
     }

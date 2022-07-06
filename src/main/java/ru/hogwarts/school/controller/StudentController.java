@@ -71,6 +71,11 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getRecentList(number));
     }
 
+    @GetMapping("/getNamesList")
+    public ResponseEntity<Collection<String>> getStudentNamesList(@RequestParam Character startLetter) {
+        return ResponseEntity.ok(studentService.getNamesList(startLetter));
+    }
+
     @GetMapping("/count")
     public Integer getStudentsCount() {
         return studentService.getCount();
