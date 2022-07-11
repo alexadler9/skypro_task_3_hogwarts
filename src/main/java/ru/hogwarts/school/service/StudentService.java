@@ -27,4 +27,8 @@ public interface StudentService {
     Integer getCount();
 
     Double getAverageAge();
+
+    void printNames();
+
+    void printNamesSynchronized();
 }
