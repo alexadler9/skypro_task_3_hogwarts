@@ -10,6 +10,7 @@ import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -107,5 +108,54 @@ public class StudentServiceImpl implements StudentService {
                 .getAverage();
         LOG.debug("Average age of students: {}", averageAge);
         return averageAge;
+    }
+
+    private void printName(List<Student> students, int index) {
+        if (index < students.size()) {
+            System.out.println(students.get(index));
+        } else {
+            System.out.println("Wrong index " + index);
+        }
+    }
+
+    private void printNamesViaThread(List<Student> students, int startIndex) {
+        try {
+            printName(students, startIndex);
+            Thread.sleep(200);
+            printName(students, startIndex + 1);
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted exception");
+        }
+    }
+
+    @Override
+    public void printNames() {
+        List<Student> students = studentRepository.findAll();
+
+        printName(students, 0);
+        printName(students, 1);
+
+        new Thread(() -> printNamesViaThread(students, 2)).start();
+        new Thread(() -> printNamesViaThread(students, 4)).start();
+    }
+
+    @Override
+    public void printNamesSynchronized() {
+        List<Student> students = studentRepository.findAll();
+
+        printName(students, 0);
+        printName(students, 1);
+
+        new Thread(() -> {
+            synchronized (students) {
+                printNamesViaThread(students, 2);
+            }
+        }).start();
+
+        new Thread(() -> {
+            synchronized (students) {
+                printNamesViaThread(students, 4);
+            }
+        }).start();
     }
 }
