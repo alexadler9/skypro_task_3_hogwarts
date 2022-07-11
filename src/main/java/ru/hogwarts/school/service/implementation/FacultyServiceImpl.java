@@ -9,7 +9,9 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -61,5 +63,28 @@ public class FacultyServiceImpl implements FacultyService {
     public Set<Student> getStudents(Long facultyId) {
         LOG.info("Was invoked method for get students for faculty {}", facultyId);
         return facultyRepository.findById(facultyId).map(Faculty::getStudents).orElse(null);
+    }
+
+    @Override
+    public String getLongestName() {
+        LOG.info("Was invoked method for get longest faculty name");
+        String longestName = facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length)).orElse(null);
+        LOG.debug("Longest faculty name: {}", longestName);
+        return longestName;
+    }
+
+    @Override
+    public Long getTestValue() {
+        LOG.info("Was invoked method for testing stream");
+        long startTime = System.nanoTime();
+        long sum = Stream.iterate(1L, a -> a + 1)
+                .limit(10_000_000)
+                .parallel()
+                .reduce(0L, Long::sum);
+        long endTime = System.nanoTime();
+        LOG.debug("Method duration in ms: {}", (endTime - startTime) / 1000000);
+        return sum;
     }
 }
